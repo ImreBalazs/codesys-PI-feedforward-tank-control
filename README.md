@@ -289,7 +289,7 @@ A saját `FB_PID_MAN` szabályozóblokk paramétereinek ($K_p$, $T_i$, $T_d$) me
 * **Tapasztalat:** A $T_i$ fokozatos beállításával az integráló tag megszüntette az állandósult hibát, és a tartályszint pontosan beállt az alapjelre. A hangolás során olyan egyensúlyt kerestünk, ahol a beállási idő optimális, de a túllövés ($overshoot$) még nem okoz instabilitást.
 
 ##### 3. Deriváló tag ($T_d$) vizsgálata
-* Utolsó lépésként kísérleteztünk a $T_d$ deriválási idő beállításával a beállási folyamat csillapításának érdekében.
+* Utolsó lépésként kísérleteztem a $T_d$ deriválási idő beállításával a beállási folyamat csillapításának érdekében.
 * **Tapasztalat:** A $T_d$ bevezetése során a fő problémát a töltőszelep felőli beömlés okozta. A tartályba érkező víz a felszínen locsogást és hullámzást váltott ki, ami átmeneti zajt és ingadozást eredményezett a szintmérő mérésében. A deriváló tag ezt a gyors mérésbeli tüskét drasztikusan felerősítette, ami a szelepek felesleges, rángatózó mozgásához (a beavatkozó szervek túlterheléséhez) vezetett, anélkül, hogy érdemben javította volna a beállási dinamikát.
 
 ##### Végeredmény
