@@ -73,3 +73,81 @@ A TrendView a folyamatdinamika valós idejű nyomon követésére és a szabály
   * **Minimum:** A vizsgált időablakban mért legkisebb érték.
   * **Maximum:** A vizsgált időablakban mért legnagyobb érték.
   * **Average:** Átlagérték az adott időintervallumban.
+
+## 3. PLC Kód és Vezérlési Logika
+
+A PLC program CODESYS V3.5 környezetben készült. A szabályozási és átkapcsolási feladatokat egy fő program blokk (`PLC_PRG`), valamint egy saját skálázó funkcióblokk (`FC_Scale`) és beépített PID szabályozók valósítják meg.
+
+---
+
+### Változódeklarációk (`VAR`)
+
+A programban használt be- és kimeneti, belső, valamint paraméterező változók struktúrája a kód alapján:
+
+```pascal
+PROGRAM PLC_PRG
+VAR
+    // Fizikai kimenetek (Szelep pozícióparancsok 0-10V)
+    rFillValveCmd      : REAL;
+    rDischargeValveCmd : REAL;
+    
+    // Üzemmódválasztó regiszter
+    iControlMode       : INT;
+    
+    // Nyers és skálázott analóg jelek
+    rLevel_Raw         : REAL;
+    rLevel_PV          : REAL;
+    rPot_Raw           : REAL;
+    rSetpoint_SP       : REAL;
+    rScaledPot         : REAL;
+    rFlowMeterRaw      : REAL;
+    rFlowMeterScaled   : REAL;
+    
+    // Vezérlő és engedélyező bit-jelek
+    bAutoMode          : BOOL := TRUE;
+    bEnableFFFB        : BOOL;
+    bHMIControl        : BOOL := FALSE;
+    rHMISetPOint       : REAL;
+    bHMI_FillBtn       : BOOL;
+    bHMI_DischargeBtn  : BOOL;
+    
+    // PID_1 paraméterek (Hand PID / HMI PID)
+    rKp                : REAL := 1.0;
+    rTi                : REAL := 5.0;
+    rTd                : REAL;
+    rTs                : REAL := 0.02;
+    
+    // PID_2 és Feedforward paraméterek (FB+FF)
+    rFKp               : REAL := 0.7;
+    rFTi               : REAL := 15.0;
+    rFTd               : REAL := 0;
+    rFKff              : REAL := 0;
+    rKDisc             : REAL := 2;
+    
+    // Hibaértékek és holtsáv
+    rError             : REAL;
+    rDeadband          : REAL := 1.5;
+    
+    // Szabályozási kimenetek és köztes számítási változók
+    rPID_Out           : REAL;
+    rFBPID_Out         : REAL;
+    rFFProduct         : REAL;
+    rNoLimitOut        : REAL;
+    rLimitedOut        : REAL;
+    
+    // Funkcióblokk példányosítások
+    FB_PID_MAN_1       : FB_PID_MAN;
+    FB_PID_MAN_2       : PID;
+END_VAR
+```
+
+---
+
+### Üzemmód-választási logika (Networks 1–4)
+
+Az üzemmódok közötti váltást az `iControlMode` egész változó értéke határozza meg, amelynek alapján a program automatikusan kiválasztja a megfelelő alapjelet és szabályozási ágat:
+
+* **Network 1 (`iControlMode = 0`):** Az `EQ` blokk összehasonlítja az `iControlMode` értékét 0-val. Egyezés esetén a `MOVE` blokk átmásolja a potencióméter skálázott értékét (`rScaledPot`) az aktív alapjelre (`rSetpoint_SP`).
+* **Network 2 (`iControlMode = 1`):** Amikor az `iControlMode` értéke 1 (HMI Manual), a bontó (N.C.) logika lekapcsolja a `bAutoMode` engedélyező bitet (`FALSE`), ezzel tiltva az automatikus PID szabályozók működését.
+* **Network 3 (`iControlMode = 2`):** Az `iControlMode = 2` feltétel teljesülésekor a `MOVE` blokk a HMI-n megadott digitális értéket (`rHMISetPOint`) írja be az aktív alapjelre (`rSetpoint_SP`).
+* **Network 4 (`iControlMode = 3`):** Az `iControlMode = 3` beállítás esetén a kimeneti tekercs aktiválja a `bEnableFFFB` bitet (`TRUE`), amely engedélyezi a kombinált Feedback + Feedforward szabályozási kört.
