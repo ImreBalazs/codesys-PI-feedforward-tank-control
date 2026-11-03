@@ -56,7 +56,7 @@ Az éppen aktív üzemmódot a HMI zöld kiemeléssel jelzi:
 
 ---
 
-### TrendView (Trendgrafikonos nézet)
+### TrendView (Grafikonos nézet)
 <img width="783" height="704" alt="{D4CED08C-BE83-43E8-88B4-1FE098CE39F5}" src="https://github.com/user-attachments/assets/866a7348-85f8-44f7-8614-0d40237f0050" />
 
 A TrendView a folyamatdinamika valós idejű nyomon követésére és a szabályozási kör beállási tulajdonságainak elemzésére szolgál.
