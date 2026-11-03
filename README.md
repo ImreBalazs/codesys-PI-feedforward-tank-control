@@ -328,3 +328,16 @@ https://www.youtube.com/watch?v=E4ijaTnyNM0
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/c91ade07-ead8-47ec-8cbc-65d4bb4532ad" />
 Az üzemmód gyakorlati működését, a szelepek HMI nyomógombokkal történő közvetlen nyitását és zárását az alábbi felvétel szemlélteti:
 https://youtu.be/ntr-lD2tA1s
+
+#### 3. HMI Auto / HMI PID üzemmód (`iControlMode = 2`)
+
+* **Működési elv:** Ez az üzemmód szabályozástechnikai szempontból megegyezik a Hand PID üzemmóddal (zárt hurkú, saját `FB_PID_MAN` alapon működő PI szabályozás), azzal az egyetlen különbséggel,hogy a vízszint alapjelét nem a fizikai potencióméter, hanem az operátor adja meg digitálisan az Ignition HMI felületről.
+* **Alapjel-választási logika (Network 3):**
+<img width="671" height="197" alt="image" src="https://github.com/user-attachments/assets/9b51a486-0f5d-49ae-9d6d-7d785f4a8a62" />
+
+  * Az `iControlMode = 2` feltétel teljesülésekor az `EQ` blokk engedélyezi a `MOVE` utasítást, amely a HMI-n beállított értéket (`rHMISetPOint`) másolja át a szabályozó aktív alapjel változójára (`rSetpoint_SP`).
+* **Szabályozási kör:** A szelepek mozgatása (Networks 5–7) és a korábban felhangolt PI paraméterek ($K_p = 1.0$, $T_i = 5.0\text{ s}$, $T_d = 0.0\text{ s}$) változatlanul érvényesülnek a stabil alapjel-követés érdekében.
+
+##### Működési demonstráció
+
+Az üzemmód működését — a HMI-n megadott alapjel szerinti automatikus szinttartást — az alábbi felvétel szemlélteti:
