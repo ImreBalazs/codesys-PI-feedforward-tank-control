@@ -1,4 +1,4 @@
-## 📌 1. Projekt áttekintése
+## 1. Projekt áttekintése
 
 A projektben egy aszimmetrikus átfolyású ipari tartály vízszintszabályozásának teljes körű automatizálását és optimális szabályozási architektúráját valósítottam meg **CODESYS V3.5** környezetben. A rendszer egy nyomott betápláló szeleppel (töltőoldal) és egy gravitációs lefolyású ürítőszeleppel rendelkezik, ahol az ürítési kapacitás felülmúlja a töltési kapacitást, a lefolyás pedig a vízoszlop magasságától függő nem-lineáris dinamikát követ (Torricelli-törvény).
 
@@ -6,13 +6,13 @@ A berendezés célja a tartályszint hajszálpontos tartása és a lefolyási ol
 
 ---
 
-### 🎛️ Fő funkciók és tulajdonságok
+### Fő funkciók és tulajdonságok
 
 * **Négyfajta üzemmód (Kézi és Automata vezérlés):** A rendszer rugalmasan kapcsolható a HMI felületről és a fizikai bemenetekről:
-  * 🟢 **Hand PID (`iControlMode = 0`):** A vízszint alapjelét egy fizikai potencióméter ($0\text{--}10\text{ V} \rightarrow 0\text{--}300\text{ cm}$) adja meg, a szabályozást a PID kör végzi.
-  * 🟡 **HMI Manual (`iControlMode = 1`):** A töltő- és ürítőszelepek közvetlen kézi vezérlése a HMI-ről ($0\text{ V}$ / $10\text{ V}$ állapotok között).
-  * 🔵 **HMI PID (`iControlMode = 2`):** Automatikus szintszabályozás a HMI-n megadott digitális alapjel alapján.
-  * 🟣 **HMI FB+FF (`iControlMode = 3`):** Fejlett Visszacsatolt + Előrecsatolt (PI + Feedforward) szabályozás, ahol az ürítőszelep mint bemeneti zavarás szerepel, a töltőszelep pedig automatikusan kompenzál.
+  * **Hand PID (`iControlMode = 0`):** A vízszint alapjelét egy fizikai potencióméter ($0\text{--}10\text{ V} \rightarrow 0\text{--}300\text{ cm}$) adja meg, a szabályozást a PID kör végzi.
+  * **HMI Manual (`iControlMode = 1`):** A töltő- és ürítőszelepek közvetlen kézi vezérlése a HMI-ről ($0\text{ V}$ / $10\text{ V}$ állapotok között).
+  * **HMI PID (`iControlMode = 2`):** Automatikus szintszabályozás a HMI-n megadott digitális alapjel alapján.
+  * **HMI FB+FF (`iControlMode = 3`):** Fejlett Visszacsatolt + Előrecsatolt (PI + Feedforward) szabályozás, ahol az ürítőszelep mint bemeneti zavarás szerepel, a töltőszelep pedig automatikusan kompenzál.
 
 * **Fejlett szabályozási architektúra (PI + Feedforward):** 
   * A visszacsatolt PI kör ($K_p = 0.7, T_i = 15\text{ s}$) a pontos alapjel-követést biztosítja.
