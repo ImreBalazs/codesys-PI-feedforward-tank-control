@@ -273,5 +273,5 @@ END_VAR
 VAR_OUTPUT
     rScaledOut    : REAL; // Skálázott fizikai érték (rScaledPot)
 END_VAR
-
+```
 <img width="707" height="613" alt="{5D6B2EB1-0D85-46C6-8CB6-936CC67DFDBD}" src="https://github.com/user-attachments/assets/96414f7e-cbfc-4332-ab0a-0a2a293e104e" />
