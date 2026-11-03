@@ -323,3 +323,8 @@ https://www.youtube.com/watch?v=E4ijaTnyNM0
     * Gombnyomásra (`G = TRUE`) $10.0\text{ V}$-ot ad a `rFillValveCmd` kimenetre.
     * Elengedett gomb esetén (`G = FALSE`) $0.0\text{ V}$ parancsot továbbít a töltőszelepnek.
 * **Alkalmazási terület:** Karbantartás, beüzemelési tesztek, valamint a tartály kézi előtöltése és leürítése a szabályozási körök indítása előtt.
+
+##### Működési demonstráció
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/c91ade07-ead8-47ec-8cbc-65d4bb4532ad" />
+Az üzemmód gyakorlati működését, a szelepek HMI nyomógombokkal történő közvetlen nyitását és zárását az alábbi felvétel szemlélteti:
+https://youtu.be/ntr-lD2tA1s
