@@ -344,7 +344,7 @@ Az üzemmód működését — a HMI-n megadott alapjel szerinti automatikus szi
 
 ###### Trendgrafikon és méréselemzés ($SP = 120\text{ cm}$)
 
-A HMI PID üzemmód (`iControlMode = 2`) működését és a szabályozó válaszát az alábbi grafikon dokumentálja $120\text{ cm}$-es alapjel-ugrás esetén:
+A HMI PID üzemmód (`iControlMode = 2`) működését és a szabályozó válaszát az alábbi HMI-n megtalálható grafikon dokumentálja $120\text{ cm}$-es alapjel-ugrás esetén:
 <img width="792" height="698" alt="image" src="https://github.com/user-attachments/assets/d8e1d59e-b5da-4424-8f26-f24a5a6b4750" />
 
 * **Alapjel-ugrás (`rsetpoint_sp`):** Az operátor a HMI felületről a `:06` időpillanatban $0\text{ cm}$-ről $120.0\text{ cm}$-re módosította a kívánt vízszintet.
