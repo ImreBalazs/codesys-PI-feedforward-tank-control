@@ -354,3 +354,23 @@ A HMI PID üzemmód (`iControlMode = 2`) működését és a szabályozó válas
 * **Alapjel-ugrás (`rsetpoint_sp`):** A HMI felületről a :06 időpillanatban $0\text{ cm}$-ről $120.0\text{ cm}$-re módosítottam a kívánt vízszintet.
 * **Átmeneti szakasz (`rlevel_pv`):** A tartály kezdeti szintje $0.12\text{ cm}$ volt. A töltőszelep nyitását követően a mért érték lineáris meredekséggel emelkedik a beállított cél felé.
 * **Beállási dinamika és állandósult állapot:** A vízszint a `:24` időpillanat körül éri el az alapjelet. A beömlő víz felszíni hullámzása miatt egy kismértékű átmeneti csúcsérték ($124.85\text{ cm}$) tapasztalható, ezt követően a felhangolt PI szabályozó gyorsan csillapítja az ingadozást, és a szint stabilan $120.66\text{ cm}$-en áll be maradó eltérés nélkül.
+
+#### 4. Feedforward + Feedback (Előrecsatolt + Visszacsatolt) üzemmód (`bEnableFFFB`)
+
+* **Működési elv:** Ez a legösszetettebb szabályozási struktúra, amely a visszacsatolt PI(D) kör mellett egy előrecsatolt (Feedforward) ágat is alkalmaz. Ebben a rendszerben **kizárólag a töltőszelep (`rFillValveCmd`) szolgál beavatkozó szervként**, míg az ürítőszelep (`rDischargeValveCmd`) a rendszert érő zavaró tényezőt (terhelésingadozást/kifolyást) szimulálja. Az előrecsatolás célja ezen mért zavarjellemző közvetlen kompenzálása még azelőtt, hogy az érdemi eltérést okozna a tartály vízszintjében.
+* **Szabályozási és vezérlési logika (Networks 14–17):**
+  
+<img width="1352" height="645" alt="image" src="https://github.com/user-attachments/assets/e340b5e3-deb3-4d37-ab7c-2aad3f9785be" />
+<img width="1285" height="593" alt="image" src="https://github.com/user-attachments/assets/3ef8588a-4c3e-46bf-8d4c-b2401778aa18" />
+
+  * **Network 14 (Visszacsatolt PID szabályozó):** A `bEnableFFFB` bit engedélyezésével a `FB_PID_MAN_2` blokk kiszámítja a visszacsatolt szabályozási jelet (`rFBPID_Out`) a mért vízszint (`rLevel_PV`) és az alapjel (`rSetpoint_SP`) különbsége alapján. Ennél a blokknál a kimeneti korlátok a megszokott $0\text{--}10\text{ V}$ helyett **$-10.0\text{ V}$ és $+10.0\text{ V}$ között** vannak megadva (`Y_MIN = -10`, `Y_MAX = 10`). Ez a szimmetrikus negatív/pozitív tartomány azért szükséges, hogy a PI szabályozó ne csak hozzáadni tudjon az előrecsatolt értékhez, hanem negatív kimenettel aktívan csökkenthesse is azt (visszavegye a töltést), ha a vízszint meghaladja az alapjelet vagy ha az előrecsatoló tag túlkompenzálna.
+  * **Network 15 (Előrecsatolás és kimeneti összegezés):**
+    * **`MUL`:** A nyers átfolyásmérő jelét (`rFlowMeterRaw`) megszorozza az előrecsatolási erősítési tényezővel (`rFKff`), így képezve az előrecsatolt kompenzációs értéket (`rFFProduct`).
+    * **`ADD`:** Összeadja az előrecsatolt tagot (`rFFProduct`) és a visszacsatolt PID kimenetét (`rFBPID_Out`), eredményül adva a korlátozatlan beavatkozó jelet (`rNoLimitOut`).
+    * **`LIMIT` & `MOVE`:** A `LIMIT` blokk a fizikai beavatkozó szeleppel kompatibilis $0.0\text{ V}$ és $10.0\text{ V}$ közé szorítja az összegezett jelet (`rLimitedOut`), amelyet a `MOVE` utasítás továbbít a beavatkozó töltőszelep kimenetére (`rFillValveCmd`).
+  * **Network 16 (Ürítőszelep / Zavarás beállítása):** A `MOVE` utasítás a `rKDisc` paraméter értékét közvetlenül az ürítőszelep kimenetére (`rDischargeValveCmd`) írja ki. Mivel az ürítőszelep nem vesz részt a szabályozási hurokban, ez az érték a szabályozási kör teszteléséhez szükséges állandó vagy változó zavarterhelést állítja be.
+  * **Network 17 (Alapjel átadása):** A HMI felületről megadott alapjelet (`rHMISetPoint`) a `MOVE` blokk átmásolja az aktív `rSetpoint_SP` változóba.
+
+##### Működési demonstráció
+
+Az előrecsatolt és visszacsatolt kombinált szabályozó működését, a zavarkompenzációt és a beavatkozó töltőszelep reagálását az alábbi felvétel szemlélteti:
