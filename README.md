@@ -151,3 +151,99 @@ Az üzemmódok közötti váltást az `iControlMode` egész változó értéke h
 * **Network 2 (`iControlMode = 1`):** Amikor az `iControlMode` értéke 1 (HMI Manual), a bontó (N.C.) logika lekapcsolja a `bAutoMode` engedélyező bitet (`FALSE`), ezzel tiltva az automatikus PID szabályozók működését.
 * **Network 3 (`iControlMode = 2`):** Az `iControlMode = 2` feltétel teljesülésekor a `MOVE` blokk a HMI-n megadott digitális értéket (`rHMISetPOint`) írja be az aktív alapjelre (`rSetpoint_SP`).
 * **Network 4 (`iControlMode = 3`):** Az `iControlMode = 3` beállítás esetén a kimeneti tekercs aktiválja a `bEnableFFFB` bitet (`TRUE`), amely engedélyezi a kombinált Feedback + Feedforward szabályozási kört.
+
+### 3.3 Egyedi PID Funkcióblokk (`FB_PID_MAN`)
+
+Az 1-es (Hand PID) és 3-as (HMI PID) üzemmódokban nem könyvtári elemet, hanem saját fejlesztésű, diszkrét idejű PID funkcióblokkot (`FB_PID_MAN`) használtam Structured Text (ST) nyelven. A blokk tartalmazza a kimeneti határolást és az integrál-túltelítődés elleni védelmet (Clamping Anti-Windup).
+
+#### A funkcióblokk ST forráskódja
+
+```pascal
+FUNCTION_BLOCK FB_PID_MAN
+VAR_INPUT
+    PV_k   : REAL; // Mért process érték (Level PV)
+    SP_k   : REAL; // Alapjel (Setpoint)
+    Kp     : REAL; // Arányos erősítés
+    Ti     : REAL; // Integrálási idő [s]
+    Td     : REAL; // Deriválási idő [s]
+    Ts     : REAL; // Mintavételezési idő [s]
+    u_min  : REAL; // Kimeneti alsó korlát (-10.0V / 0.0V)
+    u_max  : REAL; // Kimeneti felső korlát (10.0V)
+END_VAR
+VAR
+    bFirstScan : BOOL := TRUE;
+    e_k        : REAL;
+    P_k        : REAL;
+    I_kTemp    : REAL;
+    I_k_1      : REAL;
+    Dk         : REAL;
+    PV_k_1     : REAL;
+    u_raw      : REAL;
+END_VAR
+VAR_OUTPUT
+    u_k        : REAL; // Korlátozott beavatkozó jel
+END_VAR
+
+// 1. Hibaképzés és Arányos (P) tag
+e_k := SP_k - PV_k;
+P_k := Kp * e_k;
+
+// Első futás inicializálása (deriváló tüske elkerülése indításkor)
+IF bFirstScan THEN
+    PV_k_1 := PV_k;
+    bFirstScan := FALSE;
+END_IF;
+
+// 2. Integrál (I) tag számítása (Diszkrét Euler-módszer)
+IF Ti > 0.0 THEN
+    I_kTemp := I_k_1 + ((Kp / Ti) * e_k * Ts);
+ELSE
+    I_kTemp := 0.0;
+END_IF;
+
+// 3. Derivált (D) tag számítása a mért érték (PV) alapján
+IF Td > 0.0 AND Ts > 0.0 THEN
+    Dk := -Kp * Td * (PV_k - PV_k_1) / Ts;
+ELSE
+    Dk := 0.0;
+END_IF;
+
+// 4. Összegzés és kimeneti telítés/Anti-Windup kezelése
+u_raw := P_k + I_kTemp + Dk;
+
+IF u_raw >= u_max THEN
+    u_k := u_max;
+ELSIF u_raw <= u_min THEN
+    u_k := u_min;
+ELSE
+    u_k := u_raw;
+    I_k_1 := I_kTemp; // Integrál frissítése csak akkor, ha a kimenet nincs telítésben
+END_IF;
+
+PV_k_1 := PV_k;
+
+#### Algoritmus főbb tulajdonságai
+
+* **Deriválás a PV alapján (Derivative on PV):** A deriváló tag nem a hibajelből ($e_k$), hanem a mért érték változásából ($(PV_k - PV_{k-1})$) számol. Ez megakadályozza az alapjel hirtelen módosításakor fellépő úgynevezett deriválási tüskét (Derivative Kick).
+* **Feltételes integrálás (Clamping Anti-Windup):** Ha a nyers kimenet (`u_raw`) átlépi a beállított $[u_{min}, u_{max}]$ határokat, az integrál belső állapota (`I_k_1`) nem frissül. Ez megelőzi a beavatkozó szerv telítődésekor fellépő integrál-túltöltődést és az abból adódó jelentős túllövést.
+
+---
+
+### Üzemmódok részletes megvalósítása
+
+#### 1. Hand PID üzemmód (`iControlMode = 0`)
+<img width="904" height="747" alt="{703A11B6-3EC2-4F42-AA3D-C69E5754C7AC}" src="https://github.com/user-attachments/assets/d735c619-fc21-49e1-98ca-dcf60d6cf137" />
+<img width="1183" height="801" alt="{5BF4796C-DA99-4C39-A239-573CF8D13D15}" src="https://github.com/user-attachments/assets/9990edd0-e625-4045-9809-e8ab561a36c6" />
+<img width="481" height="373" alt="{82ABEC6C-FF17-41FE-9271-5E0D4FF72B8F}" src="https://github.com/user-attachments/assets/d0113354-bdac-4363-a1c4-b30bbc2f3117" />
+
+
+* **Működési elv:** A vízszint alapjelét a fizikai potencióméter adja meg. A nyers analóg bemenetet (`rPot_Raw`) az `FC_Scale` blokk konvertálja $0\text{--}300\text{ cm}$ fizikai tartományra (`rScaledPot`), ami az 1-es hálózatban átmásolódik az `rSetpoint_SP` változóba.
+* **Szabályozási logika (Networks 5, 6, 7):**
+  * A `bAutoMode = TRUE` jel engedélyezi a saját `FB_PID_MAN_1` szabályozóblokk működését.
+  * A szabályozó $u_k$ kimenete (`rPID_Out`) alapján a program eldönti a szelepek mozgatását:
+    * **Ha `rPID_Out > 0`:** A töltőszelep kap nyitóparancsot (`rFillValveCmd = rPID_Out`), az ürítőszelep zárva marad (`rDischargeValveCmd = 0`).
+    * **Ha `rPID_Out < 0`:** Az ürítőszelep nyit az előjelváltás után (`rDischargeValveCmd = rPID_Out * -1`), a töltőszelep pedig lezár (`rFillValveCmd = 0`).
+    * **Ha a hibajel a holtsávon belül van ($|rError| < rDeadband$):** Mindkét szelep parancsa 0 értéket vesz fel a felesleges szelepműködtetés elkerülése érdekében.
+
+![Hand PID Logic](docs/ladder_hand_pid.png)
+![Hand PID Demo](docs/demo_hand_pid.gif)
