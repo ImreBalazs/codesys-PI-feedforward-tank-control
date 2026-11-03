@@ -121,7 +121,7 @@ VAR
     rFKp               : REAL := 0.7;
     rFTi               : REAL := 15.0;
     rFTd               : REAL := 0;
-    rFKff              : REAL := 0;
+    rFKff              : REAL := 1.2;
     rKDisc             : REAL := 2;
     
     // Hibaértékek és holtsáv
@@ -370,6 +370,28 @@ A HMI PID üzemmód (`iControlMode = 2`) működését és a szabályozó válas
     * **`LIMIT` & `MOVE`:** A `LIMIT` blokk a fizikai beavatkozó szeleppel kompatibilis $0.0\text{ V}$ és $10.0\text{ V}$ közé szorítja az összegezett jelet (`rLimitedOut`), amelyet a `MOVE` utasítás továbbít a beavatkozó töltőszelep kimenetére (`rFillValveCmd`).
   * **Network 16 (Ürítőszelep / Zavarás beállítása):** A `MOVE` utasítás a `rKDisc` paraméter értékét közvetlenül az ürítőszelep kimenetére (`rDischargeValveCmd`) írja ki. Mivel az ürítőszelep nem vesz részt a szabályozási hurokban, ez az érték a szabályozási kör teszteléséhez szükséges állandó vagy változó zavarterhelést állítja be.
   * **Network 17 (Alapjel átadása):** A HMI felületről megadott alapjelet (`rHMISetPoint`) a `MOVE` blokk átmásolja az aktív `rSetpoint_SP` változóba.
+
+##### Szabályozó felhangolása és paraméterezése (Tuning Methodology)
+
+Az előrecsatolt-visszacsatolt (FF+FB) struktúra összehangolása két egymást követő lépésben történt:
+
+1. **Előrecsatolási tényező ($K_{ff}$) meghatározása:**  
+   Első lépésben az ürítőszelep nyitásával szimulált zavarással teszteltük a rendszert. Az átfolyásmérő jele (`rFlowMeterRaw`) alapján határoztuk meg azt az előrecsatolási szorzót ($rFKff = 1.2$), amely a kifolyási veszteséget azonnali szelepnyitással egyensúlyozza ki, még mielőtt a tartály szintje érdemben leesne.
+
+2. **Visszacsatolt PI szabályozó újrahangolása:**  
+   Mivel az előrecsatoló ág átvállalja a zavarkompenzálás jelentős részét, a PI szabályozó feladata kizárólag a maradó hibák korrekciója és az alapjel-követés maradt. A gerjedések és túllövések elkerülése érdekében a tisztán visszacsatolt módhoz képest ($K_p = 1.0, T_i = 5.0\text{ s}$) csillapítottabb paramétereket állítottam be:
+   * **Proporcionális erősítés ($K_p = 0.7$):** Kisebb erősítés a stabilabb beállás és az előrecsatolt taggal való beavatkozási konfliktusok elkerülése érdekében.
+   * **Integrálási idő ($T_i = 15.0\text{ s}$):** Hosszabb integrálási idő az átmeneti ingadozások simítására.
+   * **Differenciálási idő ($T_d = 0.0\text{ s}$):** A D-tag kikapcsolva marad a vízfelszín hullámzása okozta mérési zaj miatti ingadozások elkerülésére.
+
+###### Végleges paraméterbeállítások (CODESYS ST)
+
+```pascal
+rFKp  : REAL := 0.7;   (* Proporcionális erősítés *)
+rFTi  : REAL := 15.0;  (* Integrálási idő [s] *)
+rFTd  : REAL := 0.0;   (* Differenciálási idő (kikapcsolva a zaj miatt) *)
+rFKff : REAL := 1.2;   (* Előrecsatolási tényező (Feedforward Gain) *)
+```
 
 ##### Működési demonstráció
 
