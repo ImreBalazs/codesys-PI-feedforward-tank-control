@@ -341,6 +341,9 @@ https://youtu.be/ntr-lD2tA1s
 ##### Működési demonstráció
 
 Az üzemmód működését — a HMI-n megadott alapjel szerinti automatikus szinttartást — az alábbi felvétel szemlélteti:
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/b81aac9f-6f0c-4132-a176-f6728ab9fbe0" />
+
+https://youtu.be/h-ehwrouTPg
 
 ###### Trendgrafikon és méréselemzés ($SP = 120\text{ cm}$)
 
@@ -348,6 +351,6 @@ A HMI PID üzemmód (`iControlMode = 2`) működését és a szabályozó válas
 
 <img width="792" height="698" alt="image" src="https://github.com/user-attachments/assets/d8e1d59e-b5da-4424-8f26-f24a5a6b4750" />
 
-* **Alapjel-ugrás (`rsetpoint_sp`):** Az operátor a HMI felületről a `:06` időpillanatban $0\text{ cm}$-ről $120.0\text{ cm}$-re módosította a kívánt vízszintet.
+* **Alapjel-ugrás (`rsetpoint_sp`):** A HMI felületről a :06 időpillanatban $0\text{ cm}$-ről $120.0\text{ cm}$-re módosítottam a kívánt vízszintet.
 * **Átmeneti szakasz (`rlevel_pv`):** A tartály kezdeti szintje $0.12\text{ cm}$ volt. A töltőszelep nyitását követően a mért érték lineáris meredekséggel emelkedik a beállított cél felé.
 * **Beállási dinamika és állandósult állapot:** A vízszint a `:24` időpillanat körül éri el az alapjelet. A beömlő víz felszíni hullámzása miatt egy kismértékű átmeneti csúcsérték ($124.85\text{ cm}$) tapasztalható, ezt követően a felhangolt PI szabályozó gyorsan csillapítja az ingadozást, és a szint stabilan $120.66\text{ cm}$-en áll be maradó eltérés nélkül.
