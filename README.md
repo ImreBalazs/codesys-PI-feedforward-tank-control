@@ -402,7 +402,7 @@ https://youtu.be/Txg_ldCizi8
 
 ###### Grafikon és méréselemzés (FF+FB zavarkompenzáció)
 
-A kombinált előrecsatolt és visszacsatolt (Feedforward + Feedback) szabályozási struktúra dinamikus működését és zavarelhárító képességét az alábbi trendgrafikon szemlélteti:
+A kombinált előrecsatolt és visszacsatolt (Feedforward + Feedback) szabályozási struktúra dinamikus működését és zavarelhárító képességét az alábbi grafikon szemlélteti:
 
 <img width="795" height="713" alt="image" src="https://github.com/user-attachments/assets/0e7b675b-5ad8-4369-9b0c-11df4e5feae0" />
 
