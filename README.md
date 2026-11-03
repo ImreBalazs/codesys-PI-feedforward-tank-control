@@ -14,12 +14,8 @@ A berendezés célja a megadott vízszint-alapjel pontos lekövetése a tényleg
   * **HMI PID (`iControlMode = 2`):** Automatikus szintszabályozás a HMI-n megadott digitális alapjel alapján.
   * **HMI FB+FF (`iControlMode = 3`):** Fejlett Visszacsatolt + Előrecsatolt (PI + Feedforward) szabályozás, ahol az ürítőszelep mint bemeneti zavarás szerepel, a töltőszelep pedig automatikusan kompenzál.
 
-* **Fejlett szabályozási architektúra (PI + Feedforward):** 
-  * A visszacsatolt PI kör ($K_p = 0.7, T_i = 15\text{ s}$) a pontos alapjel-követést biztosítja.
-  * A kiömlőoldali átfolyásmérőre alapozott Előrecsatolás ($K_{ff} = 1.2$) holtidő nélkül rányit a töltőszelepre az ürítőszelep elmozdulásakor, így a zavarást még a vízszint beszakadása előtt elhárítja.
+### 🛠️ Megvalósított rendszerösszetevők
 
-* **Negatív PID tartomány ($Y_{MIN} = -10.0$) és Anti-Windup:** 
-  * A PID kimeneti alsó korlátjának $-10.0\text{ V}$-ra állításával a szabályozó képes kioltani az előrecsatolási offsetet túllépés esetén, garantálva a töltőszelep teljes lezárását ($0\%$) és a gyors ürülést/hűtést.
-
-* **Jelillesztés és skálázás (`FC_Scale`):** 
-  * A nyers $0\text{--}10\text{ V}$-os analóg jelek (`rLevel_Raw`, `rPot_Raw`, `rFlowMeterRaw`) szabványos fizikai mértékegységekké ($0\text{--}300\text{ cm}$, átfolyás) alakítása saját skáláz
+- **CODESYS V3.5 PLC Vezérlőprogram:** A teljes szabályozási architektúra, jelskálázások, illesztések és az üzemmód-választó logika lefejlesztése.
+- **Ignition HMI (Mobil / Android kompatibilis):** Modern, reszponzív ipari kezelőfelület, amellyel a rendszer távolról, akár okostelefonról vagy táblagépről is teljes körűen felügyelhető és irányítható.
+- **Factory I/O Digitális Iker (Digital Twin):** A tartályrendszer valós idejű 3D-s szimulációja a fizikai folyamatok modellezésére és a szabályozási algoritmusok éles tesztelésére.
