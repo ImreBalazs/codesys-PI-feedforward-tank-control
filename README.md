@@ -275,3 +275,25 @@ VAR_OUTPUT
 END_VAR
 ```
 <img width="707" height="613" alt="{5D6B2EB1-0D85-46C6-8CB6-936CC67DFDBD}" src="https://github.com/user-attachments/assets/96414f7e-cbfc-4332-ab0a-0a2a293e104e" />
+
+#### PID Szabályozó Hangolási Folyamata (Tuning)
+
+A saját `FB_PID_MAN` szabályozóblokk paramétereinek ($K_p$, $T_i$, $T_d$) meghatározása manuális, kísérleti úton történt a szimulációs környezetben. A hangolás során lépésről lépésre vizsgáltuk az egyes tagok hatását a beállási folyamatra:
+
+##### 1. Arányos tag ($K_p$) beállítása
+* Első lépésként az integráló és deriváló tagokat kikapcsoltuk ($T_i = 0$, $T_d = 0$), és kizárólag a $K_p$ arányos erősítést növeltük.
+* **Tapasztalat:** A $K_p$ növelésével a rendszer válaszideje gyorsult, azonban tisztán arányos szabályozással maradó szabályozási eltérés (offset) keletkezett. A tartály gravitációs lefolyási sajátossága miatt a kimenet nem tudta teljesen elérni a kívánt alapjelet ($SP$).
+
+##### 2. Integráló tag ($T_i$) bevezetése
+* A maradó eltérés megszüntetésére bekapcsoltuk a $T_i$ integrálási időt.
+* **Tapasztalat:** A $T_i$ fokozatos beállításával az integráló tag megszüntette az állandósult hibát, és a tartályszint pontosan beállt az alapjelre. A hangolás során olyan egyensúlyt kerestünk, ahol a beállási idő optimális, de a túllövés ($overshoot$) még nem okoz instabilitást.
+
+##### 3. Deriváló tag ($T_d$) vizsgálata
+* Utolsó lépésként kísérleteztünk a $T_d$ deriválási idő beállításával a beállási folyamat csillapításának érdekében.
+* **Tapasztalat:** A tartály szintszabályozása lassan változó, nagy tehetetlenségű folyamat. A $T_d$ bevezetése a mérés zajérzékenysége miatt a szelepek felesleges, ingadozó mozgásához (beavatkozó szerv terheléséhez) vezetett, anélkül, hogy érdemben javította volna a beállási dinamikát. 
+
+##### Végeredmény
+A kísérletek alapján a deriváló tag elhagyásra került ($T_d = 0\text{ s}$), így a végleges, stabil alapjel-követést biztosító szabályozó egy tisztán PI struktúra lett az alábbi paraméterekkel:
+* $K_p = 1.0$
+* $T_i = 5.0\text{ s}$
+* $T_d = 0.0\text{ s}$
