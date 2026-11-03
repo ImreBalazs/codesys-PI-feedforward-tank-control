@@ -297,3 +297,20 @@ A fizikai mérészaj és a felszíni hullámzás felerősödése miatt a derivá
 * $K_p = 1.0$
 * $T_i = 5.0\text{ s}$
 * $T_d = 0.0\text{ s}$
+
+##### Működési teszt és beállási dinamika ($SP = 157\text{ cm}$)
+
+A Hand PID üzemmód működésének és a felhangolt PI szabályozó hatékonyságának szemléltetésére a fizikai potencióméterrel egy $157\text{ cm}$-es alapjel-ugrást hoztunk létre.
+
+###### Demonstrációs videó
+Az alábbi felvételen látható a potencióméter beállítása és a tartály szintjének automatikus reagálása a 3D-s szimulációs környezetben:
+https://www.youtube.com/watch?v=E4ijaTnyNM0
+
+###### Trendgrafikon és elemzés
+A beállási folyamatról készült grafikon jól mutatja a szabályozási kör átmeneti dinamikáját:
+
+
+
+* **Alapjel-ugrás (`rsetpoint_sp`):** A potencióméter elforgatásával az alapjel a `:36` időpillanatban $0\text{ cm}$-ről hirtelen $156.9\text{ cm}$-re ugrik.
+* **Átmeneti szakasz (`rlevel_pv`):** A mért tartályszint a kezdeti $1.18\text{ cm}$-es értékről indulva, a töltőszelep nyitását követően egyenletes meredekséggel emelkedik a célérték irányába.
+* **Beállási folyamat és állandósult állapot:** A célérték megközelítésekor a felhangolt PI szabályozó ($K_p = 1.0$, $T_i = 5.0\text{ s}$) csillapítja az emelkedést, túllövésmentes beállást biztosítva. A mérés alapján a vízszint stabilan beáll $156.21\text{ cm}$-re (a vizsgált ablakban mért maximum $156.39\text{ cm}$), megszüntetve a maradó szabályozási eltérést.
