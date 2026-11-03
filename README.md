@@ -221,6 +221,7 @@ ELSE
 END_IF;
 
 PV_k_1 := PV_k;
+```
 
 #### Algoritmus főbb tulajdonságai
 
