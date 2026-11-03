@@ -27,6 +27,8 @@ A rendszer felügyeletét és irányítását egy Ignition alapon megvalósítot
 ---
 
 ### MainView (Főnézet)
+<img width="783" height="704" alt="{D4CED08C-BE83-43E8-88B4-1FE098CE39F5}" src="https://github.com/user-attachments/assets/31154073-350e-4a91-8ddc-4b8c92762956" />
+<img width="787" height="773" alt="{9FB7FA17-B848-4164-A4E1-689B645A708F}" src="https://github.com/user-attachments/assets/b3deec7b-cdbd-48d0-9835-23ce842dab4a" />
 
 A MainView a folyamat valós idejű megjelenítésére, az üzemmódok közötti váltásra, az alapjelek megadására és a kézi beavatkozásra szolgál.
 
@@ -56,6 +58,7 @@ Az éppen aktív üzemmódot a HMI zöld kiemeléssel jelzi:
 ---
 
 ### TrendView (Trendgrafikonos nézet)
+<img width="783" height="704" alt="{D4CED08C-BE83-43E8-88B4-1FE098CE39F5}" src="https://github.com/user-attachments/assets/866a7348-85f8-44f7-8614-0d40237f0050" />
 
 A TrendView a folyamatdinamika valós idejű nyomon követésére és a szabályozási kör beállási tulajdonságainak elemzésére szolgál.
 
