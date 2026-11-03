@@ -152,7 +152,7 @@ Az üzemmódok közötti váltást az `iControlMode` egész változó értéke h
 * **Network 3 (`iControlMode = 2`):** Az `iControlMode = 2` feltétel teljesülésekor a `MOVE` blokk a HMI-n megadott digitális értéket (`rHMISetPOint`) írja be az aktív alapjelre (`rSetpoint_SP`).
 * **Network 4 (`iControlMode = 3`):** Az `iControlMode = 3` beállítás esetén a kimeneti tekercs aktiválja a `bEnableFFFB` bitet (`TRUE`), amely engedélyezi a kombinált Feedback + Feedforward szabályozási kört.
 
-### 3.3 Egyedi PID Funkcióblokk (`FB_PID_MAN`)
+### Egyedi PID Funkcióblokk (`FB_PID_MAN`)
 
 Az 1-es (Hand PID) és 3-as (HMI PID) üzemmódokban nem könyvtári elemet, hanem saját fejlesztésű, diszkrét idejű PID funkcióblokkot (`FB_PID_MAN`) használtam Structured Text (ST) nyelven. A blokk tartalmazza a kimeneti határolást és az integrál-túltelítődés elleni védelmet (Clamping Anti-Windup).
 
