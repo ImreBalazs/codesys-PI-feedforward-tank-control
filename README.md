@@ -277,3 +277,140 @@ VAR_OUTPUT
 END_VAR
 ```
 <img width="707" height="613" alt="{5D6B2EB1-0D85-46C6-8CB6-936CC67DFDBD}" src="https://github.com/user-attachments/assets/96414f7e-cbfc-4332-ab0a-0a2a293e104e" />
+
+#### PID Controller Tuning Process
+
+The parameters ($K_p$, $T_i$, $T_d$) of the custom `FB_PID_MAN` controller block were determined manually, through experimentation in the simulation environment. During tuning, we examined the effect of each term on the settling process step by step:
+
+##### 1. Setting the Proportional Term ($K_p$)
+* As a first step, the integral and derivative terms were switched off, and only the proportional gain $K_p$ was increased.
+* **Observation:** Increasing $K_p$ made the system response faster, but pure proportional control produced a steady-state error (offset). Due to the gravitational drain characteristics of the tank, the output could not fully reach the desired setpoint ($SP$).
+
+##### 2. Introducing the Integral Term ($T_i$)
+* To eliminate the steady-state error, the integral time $T_i$ was switched on.
+* **Observation:** By gradually adjusting $T_i$, the integral term eliminated the steady-state error, and the tank level settled exactly at the setpoint. During tuning, we looked for a balance where the settling time is optimal, but the overshoot does not yet cause instability.
+
+##### 3. Investigating the Derivative Term ($T_d$)
+* As a last step, I experimented with the derivative time $T_d$ in order to damp the settling process.
+* **Observation:** When introducing $T_d$, the main problem was caused by the inflow from the fill valve. The water entering the tank caused sloshing and waves on the surface, which resulted in temporary noise and fluctuation in the level sensor measurement. The derivative term drastically amplified these rapid measurement spikes, which led to unnecessary, jittery movement of the valves (overloading the actuators), without meaningfully improving the settling dynamics.
+
+##### Final Result
+Due to the amplification of physical measurement noise and surface waves, the derivative term was omitted ($T_d = 0\text{ s}$), so the final controller providing stable setpoint tracking became a pure PI structure with the following parameters:
+* $K_p = 1.0$
+* $T_i = 5.0\text{ s}$
+* $T_d = 0.0\text{ s}$
+
+##### Functional Test and Settling Dynamics ($SP = 142\text{ cm}$)
+
+To demonstrate the operation of the Hand PID mode and the effectiveness of the tuned PI controller, a setpoint step of $142\text{ cm}$ was created using the physical potentiometer.
+
+###### Demonstration Video
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/3e12dfdd-6587-46df-bae8-4fd2046a9c1a" />
+
+The recording below shows the potentiometer adjustment and the automatic response of the tank level in the 3D simulation environment:
+https://www.youtube.com/watch?v=E4ijaTnyNM0
+
+#### 2. HMI Manual Mode (`iControlMode = 1`)
+
+* **Operating principle:** This is an open-loop manual control mode, where automatic closed-loop PID control is completely switched off. The operator can operate the fill and discharge valves directly in a discrete manner (0 V or 10 V, i.e. fully closed or 100% open) using push buttons on the Ignition HMI interface.
+  
+<img width="533" height="552" alt="image" src="https://github.com/user-attachments/assets/20056c58-7a69-4db4-ae98-7217e727f85d" />
+ 
+* **Manual control logic (Networks 11–12):**
+  * At the beginning of both networks there is a normally closed (N.C.) contact (`bAutoMode`), which ensures that manual valve commands can take effect only when automatic mode is switched off (`bAutoMode = FALSE`).
+  * **Network 11 (Discharge valve control):** The `SEL` (Select) block chooses based on the state of the `bHMI_DischargeBtn` HMI push button:
+    * If the button is active (`G = TRUE`), the `SEL` block writes the value of the `IN1` input ($10.0\text{ V}$) to the `rDischargeValveCmd` output (valve fully open).
+    * If the button is inactive (`G = FALSE`), the value of the `IN0` input ($0.0\text{ V}$) is written to the output (valve fully closed).
+  * **Network 12 (Fill valve control):** The `SEL` block works similarly, based on the signal of the `bHMI_FillBtn` HMI push button:
+    * When the button is pressed (`G = TRUE`), it outputs $10.0\text{ V}$ to the `rFillValveCmd` output.
+    * When the button is released (`G = FALSE`), it forwards a $0.0\text{ V}$ command to the fill valve.
+* **Application area:** Maintenance, commissioning tests, as well as manual pre-filling and draining of the tank before starting the control loops.
+
+##### Functional Demonstration
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/c91ade07-ead8-47ec-8cbc-65d4bb4532ad" />
+The practical operation of the mode, i.e. the direct opening and closing of the valves with the HMI push buttons, is illustrated in the recording below:
+https://youtu.be/ntr-lD2tA1s
+
+#### 3. HMI Auto / HMI PID Mode (`iControlMode = 2`)
+
+* **Operating principle:** From a control engineering point of view, this mode is identical to the Hand PID mode (closed-loop PI control based on the custom `FB_PID_MAN`), with the single difference that the water level setpoint is not provided by the physical potentiometer, but is entered digitally by the operator from the Ignition HMI interface.
+* **Setpoint selection logic (Network 3):**
+<img width="671" height="197" alt="image" src="https://github.com/user-attachments/assets/9b51a486-0f5d-49ae-9d6d-7d785f4a8a62" />
+
+  * When the condition `iControlMode = 2` is met, the `EQ` block enables the `MOVE` instruction, which copies the value set on the HMI (`rHMISetPOint`) to the controller's active setpoint variable (`rSetpoint_SP`).
+* **Control loop:** The valve actuation (Networks 5–7) and the previously tuned PI parameters ($K_p = 1.0$, $T_i = 5.0\text{ s}$, $T_d = 0.0\text{ s}$) apply unchanged to ensure stable setpoint tracking.
+
+##### Functional Demonstration
+
+The operation of the mode — automatic level holding according to the setpoint entered on the HMI — is illustrated in the recording below:
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/b81aac9f-6f0c-4132-a176-f6728ab9fbe0" />
+
+https://youtu.be/h-ehwrouTPg
+
+###### Trend Chart and Measurement Analysis ($SP = 120\text{ cm}$)
+
+The operation of the HMI PID mode (`iControlMode = 2`) and the controller response are documented by the chart on the HMI below, for a setpoint step of $120\text{ cm}$:
+
+<img width="792" height="698" alt="image" src="https://github.com/user-attachments/assets/d8e1d59e-b5da-4424-8f26-f24a5a6b4750" />
+
+* **Setpoint step (`rsetpoint_sp`):** At time :06, I changed the desired water level from $0\text{ cm}$ to $120.0\text{ cm}$ from the HMI interface.
+* **Transient phase (`rlevel_pv`):** The initial tank level was $0.12\text{ cm}$. After the fill valve opened, the measured value rises toward the set target with a linear slope.
+* **Settling dynamics and steady state:** The water level reaches the setpoint around time `:24`. Due to surface waves from the incoming water, a small transient peak ($124.85\text{ cm}$) can be observed, after which the tuned PI controller quickly damps the fluctuation, and the level settles stably at $120.66\text{ cm}$ with no remaining offset.
+
+#### 4. Feedforward + Feedback Mode (`bEnableFFFB`)
+
+* **Operating principle:** This is the most complex control structure, which in addition to the feedback PI(D) loop also uses a feedforward branch. In this system, **only the fill valve (`rFillValveCmd`) serves as the actuator**, while the discharge valve (`rDischargeValveCmd`) simulates the disturbance acting on the system (load fluctuation/outflow). The purpose of the feedforward is to directly compensate this measured disturbance before it causes a significant deviation in the tank water level.
+* **Control and command logic (Networks 14–17):**
+  
+<img width="1352" height="645" alt="image" src="https://github.com/user-attachments/assets/e340b5e3-deb3-4d37-ab7c-2aad3f9785be" />
+<img width="1285" height="593" alt="image" src="https://github.com/user-attachments/assets/3ef8588a-4c3e-46bf-8d4c-b2401778aa18" />
+
+  * **Network 14 (Feedback PID controller):** When the `bEnableFFFB` bit is enabled, the `FB_PID_MAN_2` block calculates the feedback control signal (`rFBPID_Out`) based on the difference between the measured water level (`rLevel_PV`) and the setpoint (`rSetpoint_SP`). For this block, the output limits are set **between $-10.0\text{ V}$ and $+10.0\text{ V}$** instead of the usual $0\text{--}10\text{ V}$ (`Y_MIN = -10`, `Y_MAX = 10`). This symmetric negative/positive range is necessary so that the PI controller can not only add to the feedforward value, but also actively reduce it with a negative output (take back the filling) if the water level exceeds the setpoint or if the feedforward term would overcompensate.
+  * **Network 15 (Feedforward and output summation):**
+    * **`MUL`:** Multiplies the raw flow meter signal (`rFlowMeterRaw`) by the feedforward gain factor (`rFKff`), thus forming the feedforward compensation value (`rFFProduct`).
+    * **`ADD`:** Adds the feedforward term (`rFFProduct`) and the feedback PID output (`rFBPID_Out`), yielding the unlimited control signal (`rNoLimitOut`).
+    * **`LIMIT` & `MOVE`:** The `LIMIT` block clamps the summed signal (`rLimitedOut`) between $0.0\text{ V}$ and $10.0\text{ V}$, compatible with the physical actuator valve, which the `MOVE` instruction forwards to the output of the actuating fill valve (`rFillValveCmd`).
+  * **Network 16 (Discharge valve / Disturbance setting):** The `MOVE` instruction writes the value of the `rKDisc` parameter directly to the discharge valve output (`rDischargeValveCmd`). Since the discharge valve does not take part in the control loop, this value sets the constant or variable disturbance load required for testing the control loop.
+  * **Network 17 (Setpoint transfer):** The `MOVE` block copies the setpoint entered on the HMI (`rHMISetPoint`) to the active `rSetpoint_SP` variable.
+
+##### Controller Tuning and Parameterization (Tuning Methodology)
+
+The coordination of the feedforward-feedback (FF+FB) structure was carried out in two consecutive steps:
+
+1. **Determining the Feedforward Gain ($K_{ff}$):**  
+   In the first step, we tested the system with a disturbance simulated by opening the discharge valve. Based on the flow meter signal (`rFlowMeterRaw`), we determined the feedforward multiplier ($rFKff = 1.2$) that balances the outflow loss with immediate valve opening, before the tank level actually drops significantly.
+
+2. **Retuning the Feedback PI Controller:**  
+   Since the feedforward branch takes over a significant part of the disturbance compensation, the task of the PI controller remained solely the correction of residual errors and setpoint tracking. To avoid oscillations and overshoots, I set more damped parameters compared to the pure feedback mode ($K_p = 1.0, T_i = 5.0\text{ s}$):
+   * **Proportional gain ($K_p = 0.7$):** Lower gain for more stable settling and to avoid actuation conflicts with the feedforward term.
+   * **Integral time ($T_i = 15.0\text{ s}$):** Longer integral time to smooth transient fluctuations.
+   * **Derivative time ($T_d = 0.0\text{ s}$):** The D term remains switched off to avoid fluctuations caused by measurement noise from the water surface waves.
+
+###### Final Parameter Settings (CODESYS ST)
+
+```pascal
+rFKp  : REAL := 0.7;   (* Proportional gain *)
+rFTi  : REAL := 15.0;  (* Integral time [s] *)
+rFTd  : REAL := 0.0;   (* Derivative time (switched off due to noise) *)
+rFKff : REAL := 1.2;   (* Feedforward gain *)
+```
+
+##### Functional Demonstration
+
+The operation of the combined feedforward and feedback controller, the disturbance compensation, and the response of the actuating fill valve are illustrated in the recording below:
+
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/9fd50742-0143-467c-aa9e-c1b34ecee79c" />
+https://youtu.be/Txg_ldCizi8
+
+###### Chart and Measurement Analysis (FF+FB Disturbance Compensation)
+
+The dynamic operation and disturbance rejection capability of the combined feedforward and feedback (Feedforward + Feedback) control structure is illustrated by the chart below:
+
+<img width="795" height="713" alt="image" src="https://github.com/user-attachments/assets/0e7b675b-5ad8-4369-9b0c-11df4e5feae0" />
+
+* **Setpoint tracking (`rsetpoint_sp`):** The desired water level set on the HMI interface is $100.0\text{ cm}$.
+* **Filling phase and stabilization (`rlevel_pv`):** Starting from an initial value of $0.1\text{ cm}$, the tank reaches the $100.0\text{ cm}$ setpoint with a uniform slope and without overshoot around the 9:40 mark.
+* **Disturbance load and immediate feedforward reaction:** 
+  * After reaching steady state, I suddenly increased the opening value of the discharge valve to $40\%$ ($4.0\text{ V}$), causing a significant mass flow loss in the system.
+  * The chart shows that, due to the outflow, the measured water level (`rlevel_pv`) shows only a minimal, momentary dip at 9:40.
+  * The feedforward branch based on flow measurement immediately compensated the outflow by opening the fill valve further, so in cooperation with the feedback PI loop the system stabilized the level almost instantly with no remaining offset ($100.02\text{ cm}$, the maximum peak value was only $100.13\text{ cm}$).
