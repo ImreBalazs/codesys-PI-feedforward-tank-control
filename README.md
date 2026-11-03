@@ -1,8 +1,8 @@
 ## 1. Projekt áttekintése
 
-A projektben egy aszimmetrikus átfolyású ipari tartály vízszintszabályozásának teljes körű automatizálását és optimális szabályozási architektúráját valósítottam meg **CODESYS V3.5** környezetben. A rendszer egy nyomott betápláló szeleppel (töltőoldal) és egy gravitációs lefolyású ürítőszeleppel rendelkezik, ahol az ürítési kapacitás felülmúlja a töltési kapacitást, a lefolyás pedig a vízoszlop magasságától függő nem-lineáris dinamikát követ (Torricelli-törvény).
+A projektben egy aszimmetrikus átfolyású ipari tartály vízszintszabályozásának teljes körű automatizálását és optimális szabályozási architektúráját valósítottam meg **CODESYS V3.5** környezetben. A tartály feltöltését egy töltőszelep, ürítését pedig egy gravitációs lefolyású szelep végzi. A kiömlő oldal nagyobb kapacitású a töltőoldalnál, a lefolyás sebessége pedig a tartályban lévő vízoszlop magasságával (a víznyomással) arányosan változik.
 
-A berendezés célja a tartályszint hajszálpontos tartása és a lefolyási oldalon fellépő hirtelen terhelésváltozások (zavarások) azonnali kompenzálása.
+A berendezés célja a megadott vízszint-alapjel pontos lekövetése a tényleges tartályszinttel, valamint a lefolyási oldalon fellépő hirtelen terhelésváltozások (zavarások) azonnali kompenzálása.
 
 ---
 
