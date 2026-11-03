@@ -76,7 +76,7 @@ A TrendView a folyamatdinamika valós idejű nyomon követésére és a szabály
 
 ## 3. PLC Kód és Vezérlési Logika
 
-A PLC program CODESYS V3.5 környezetben készült. A szabályozási és átkapcsolási feladatokat egy fő program blokk (`PLC_PRG`), valamint egy saját skálázó funkcióblokk (`FC_Scale`) és beépített PID szabályozók valósítják meg.
+A PLC program CODESYS V3.5 környezetben készült. A szabályozási és átkapcsolási feladatokat egy fő programblokk (`PLC_PRG`), egy saját skálázó funkcióblokk (`FC_Scale`), egy egyedileg megírt PID szabályozó blokk (`FB_PID_MAN`), valamint a CODESYS beépített `PID` könyvtári funkcióblokkja valósítják meg.
 
 ---
 
