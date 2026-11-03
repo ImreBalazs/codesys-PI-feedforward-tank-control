@@ -245,3 +245,33 @@ PV_k_1 := PV_k;
     * **Ha `rPID_Out > 0`:** A töltőszelep kap nyitóparancsot (`rFillValveCmd = rPID_Out`), az ürítőszelep zárva marad (`rDischargeValveCmd = 0`).
     * **Ha `rPID_Out < 0`:** Az ürítőszelep nyit az előjelváltás után (`rDischargeValveCmd = rPID_Out * -1`), a töltőszelep pedig lezár (`rFillValveCmd = 0`).
     * **Ha a hibajel a holtsávon belül van ($|rError| < rDeadband$):** Mindkét szelep parancsa 0 értéket vesz fel a felesleges szelepműködtetés elkerülése érdekében.
+
+#### Analóg jelillesztés és skálázás (`FC_Scale`)
+
+A nyers $0\text{--}10\text{ V}$-os analóg bemeneti jelek — mint a tartály vízszintje (`rLevel_Raw`), a fizikai potencióméter (`rPot_Raw`), valamint a kiömlőoldali átfolyásmérő (`rFlowMeterRaw`) — szabványos fizikai mértékegységekbe ($0\text{--}300\text{ cm}$, átfolyás) történő átszámítását a saját megírású `FC_Scale` funkcióblokk végzi lineáris interpolációval:
+
+$$\text{rScaledOut} = \frac{\text{rIn} - \text{rInMin}}{\text{rInMax} - \text{rInMin}} \cdot (\text{rOutMax} - \text{rOutMin}) + \text{rOutMin}$$
+
+##### Blokk interface deklarációja
+
+```pascal
+FUNCTION FC_Scale : REAL
+VAR_INPUT
+    rIn      : REAL; // Nyers analóg bemenet (pl. rPot_Raw: 0.0 - 10.0 V)
+    rInMin   : REAL; // Bemeneti skála minimuma (0.0 V)
+    rInMax   : REAL; // Bemeneti skála maximuma (10.0 V)
+    rOutMin  : REAL; // Fizikai tartomány minimuma (0.0 cm)
+    rOutMax  : REAL; // Fizikai tartomány maximuma (300.0 cm)
+END_VAR
+VAR
+    rInDiff       : REAL;
+    rInSpan       : REAL;
+    rOutSpan      : REAL;
+    rRatio        : REAL;
+    rScaledOffset : REAL;
+END_VAR
+VAR_OUTPUT
+    rScaledOut    : REAL; // Skálázott fizikai érték (rScaledPot)
+END_VAR
+
+<img width="707" height="613" alt="{5D6B2EB1-0D85-46C6-8CB6-936CC67DFDBD}" src="https://github.com/user-attachments/assets/96414f7e-cbfc-4332-ab0a-0a2a293e104e" />
