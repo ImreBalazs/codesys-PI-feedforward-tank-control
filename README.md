@@ -307,3 +307,19 @@ A Hand PID üzemmód működésének és a felhangolt PI szabályozó hatékonys
 
 Az alábbi felvételen látható a potencióméter beállítása és a tartály szintjének automatikus reagálása a 3D-s szimulációs környezetben:
 https://www.youtube.com/watch?v=E4ijaTnyNM0
+
+#### 2. HMI Manual üzemmód (`iControlMode = 1`)
+
+* **Működési elv:** Ez a nyílt hurkú (Open-loop) kézi beavatkozási üzemmód, ahol az automatikus zárt hurkú PID szabályozás teljesen ki van kapcsolva. Az operátor az Ignition HMI felületen elhelyezett nyomógombok segítségével közvetlenül, diskrét módon (0 V vagy 10 V, azaz teljesen zárva vagy 100%-ig nyitva) tudja működtetni a töltő- és ürítőszelepeket.
+  
+<img width="533" height="552" alt="image" src="https://github.com/user-attachments/assets/20056c58-7a69-4db4-ae98-7217e727f85d" />
+ 
+* **Kézivezérlési logika (Networks 11–12):**
+  * Mindkét hálózat elején egy bontó (N.C.) kontaktus található (`bAutoMode`), amely szavatolja, hogy a manuális szelepparancsok kizárólag kikapcsolt automatika (`bAutoMode = FALSE`) mellett léphessenek érvénybe.
+  * **Network 11 (Ürítőszelep vezérlése):** A `SEL` (Select) blokk a `bHMI_DischargeBtn` HMI nyomógomb állapota alapján választ:
+    * Ha a gomb aktív (`G = TRUE`), a `SEL` blokk az `IN1` bemenet értékét ($10.0\text{ V}$) írja ki a `rDischargeValveCmd` kimenetre (szelep fully open).
+    * Ha a gomb inaktív (`G = FALSE`), az `IN0` bemenet értéke ($0.0\text{ V}$) kerül a kimenetre (szelep fully closed).
+  * **Network 12 (Töltőszelep vezérlése):** A `SEL` blokk a `bHMI_FillBtn` HMI nyomógomb jele alapján hasonlóan működik:
+    * Gombnyomásra (`G = TRUE`) $10.0\text{ V}$-ot ad a `rFillValveCmd` kimenetre.
+    * Elengedett gomb esetén (`G = FALSE`) $0.0\text{ V}$ parancsot továbbít a töltőszelepnek.
+* **Alkalmazási terület:** Karbantartás, beüzemelési tesztek, valamint a tartály kézi előtöltése és leürítése a szabályozási körök indítása előtt.
