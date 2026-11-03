@@ -281,7 +281,7 @@ END_VAR
 A saját `FB_PID_MAN` szabályozóblokk paramétereinek ($K_p$, $T_i$, $T_d$) meghatározása manuális, kísérleti úton történt a szimulációs környezetben. A hangolás során lépésről lépésre vizsgáltuk az egyes tagok hatását a beállási folyamatra:
 
 ##### 1. Arányos tag ($K_p$) beállítása
-* Első lépésként az integráló és deriváló tagokat kikapcsoltuk ($T_i = 0$, $T_d = 0$), és kizárólag a $K_p$ arányos erősítést növeltük.
+* Első lépésként az integráló és deriváló tagokat kikapcsoltuk , és kizárólag a $K_p$ arányos erősítést növeltük.
 * **Tapasztalat:** A $K_p$ növelésével a rendszer válaszideje gyorsult, azonban tisztán arányos szabályozással maradó szabályozási eltérés (offset) keletkezett. A tartály gravitációs lefolyási sajátossága miatt a kimenet nem tudta teljesen elérni a kívánt alapjelet ($SP$).
 
 ##### 2. Integráló tag ($T_i$) bevezetése
@@ -290,10 +290,10 @@ A saját `FB_PID_MAN` szabályozóblokk paramétereinek ($K_p$, $T_i$, $T_d$) me
 
 ##### 3. Deriváló tag ($T_d$) vizsgálata
 * Utolsó lépésként kísérleteztünk a $T_d$ deriválási idő beállításával a beállási folyamat csillapításának érdekében.
-* **Tapasztalat:** A tartály szintszabályozása lassan változó, nagy tehetetlenségű folyamat. A $T_d$ bevezetése a mérés zajérzékenysége miatt a szelepek felesleges, ingadozó mozgásához (beavatkozó szerv terheléséhez) vezetett, anélkül, hogy érdemben javította volna a beállási dinamikát. 
+* **Tapasztalat:** A $T_d$ bevezetése során a fő problémát a töltőszelep felőli beömlés okozta. A tartályba érkező víz a felszínen locsogást és hullámzást váltott ki, ami átmeneti zajt és ingadozást eredményezett a szintmérő mérésében. A deriváló tag ezt a gyors mérésbeli tüskét drasztikusan felerősítette, ami a szelepek felesleges, rángatózó mozgásához (a beavatkozó szervek túlterheléséhez) vezetett, anélkül, hogy érdemben javította volna a beállási dinamikát.
 
 ##### Végeredmény
-A kísérletek alapján a deriváló tag elhagyásra került ($T_d = 0\text{ s}$), így a végleges, stabil alapjel-követést biztosító szabályozó egy tisztán PI struktúra lett az alábbi paraméterekkel:
+A fizikai mérészaj és a felszíni hullámzás felerősödése miatt a deriváló tag elhagyásra került ($T_d = 0\text{ s}$), így a végleges, stabil alapjel-követést biztosító szabályozó egy tisztán PI struktúra lett az alábbi paraméterekkel:
 * $K_p = 1.0$
 * $T_i = 5.0\text{ s}$
 * $T_d = 0.0\text{ s}$
