@@ -47,7 +47,7 @@ Az éppen aktív üzemmódot a HMI zöld kiemeléssel jelzi:
 * **Hand PID:** Kiválasztja a potencióméteres kézi alapjel-beállítású automatikus PID szabályozást (`iControlMode = 0`).
 * **HMI Manual:** Átkapcsol a közvetlen szelepműködtetésű kézi üzemmódra (`iControlMode = 1`).
 * **HMI PID:** Aktiválja a HMI alapjellel működő automatikus PID szabályozást (`iControlMode = 2`).
-* **HMI FB+FF:** Behatásolhatja a Feedback + Feedforward (PI + Előrecsatolás) zavarkompenzáló szabályozást (`iControlMode = 3`).
+* **HMI FB+FF:** Aktiválja a fejlett Visszacsatolt + Előrecsatolt (PI + Feedforward) zavarkompenzáló szabályozást (iControlMode = 3).
 
 #### Beavatkozó elemek és beviteli mezők
 * **Fill gomb (balra):** HMI Manual üzemmódban a töltőszelep nyitása és zárása ($0\text{ V} / 10\text{ V}$).
