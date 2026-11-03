@@ -396,3 +396,19 @@ rFKff : REAL := 1.2;   (* Előrecsatolási tényező (Feedforward Gain) *)
 ##### Működési demonstráció
 
 Az előrecsatolt és visszacsatolt kombinált szabályozó működését, a zavarkompenzációt és a beavatkozó töltőszelep reagálását az alábbi felvétel szemlélteti:
+
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/9fd50742-0143-467c-aa9e-c1b34ecee79c" />
+https://youtu.be/Txg_ldCizi8
+
+###### Grafikon és méréselemzés (FF+FB zavarkompenzáció)
+
+A kombinált előrecsatolt és visszacsatolt (Feedforward + Feedback) szabályozási struktúra dinamikus működését és zavarelhárító képességét az alábbi trendgrafikon szemlélteti:
+
+<img width="795" height="713" alt="image" src="https://github.com/user-attachments/assets/0e7b675b-5ad8-4369-9b0c-11df4e5feae0" />
+
+* **Alapjel-követés (`rsetpoint_sp`):** A HMI felületen beállított kívánt vízszint $100.0\text{ cm}$.
+* **Feltöltési szakasz és stabilizáció (`rlevel_pv`):** A tartály $0.1\text{ cm}$-es kezdőértékről indulva egyenletes meredekséggel, túllövésmentesen éri el a $100.0\text{ cm}$-es alapjelet a 9:40-es időpillanat környékén.
+* **Zavarterhelés és azonnali előrecsatolt reakció:** 
+  * Az állandósult állapot elérése után az ürítőszelep nyitási értékét hirtelen $40\%$-ra ($4.0\text{ V}$) növeltem, jelentős tömegáram-veszteséget idézve elő a rendszerben.
+  * A grafikonon megfigyelhető, hogy a kifolyás miatt a mért vízszint (`rlevel_pv`) csupán egy minimális, pillanatnyi beszakadást mutat 9:40-nél.
+  * Az átfolyásmérésre épülő előrecsatolt (Feedforward) ág azonnal kompenzálta a kifolyást a töltőszelep rányitásával, így a visszacsatolt PI körrel együttműködve a rendszer maradó eltérés nélkül, szinte azonnal stabilizálta a szintet ($100.02\text{ cm}$, a maximális csúcsérték mindössze $100.13\text{ cm}$ volt).
