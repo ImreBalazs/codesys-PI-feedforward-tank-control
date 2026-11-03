@@ -245,6 +245,3 @@ PV_k_1 := PV_k;
     * **Ha `rPID_Out > 0`:** A töltőszelep kap nyitóparancsot (`rFillValveCmd = rPID_Out`), az ürítőszelep zárva marad (`rDischargeValveCmd = 0`).
     * **Ha `rPID_Out < 0`:** Az ürítőszelep nyit az előjelváltás után (`rDischargeValveCmd = rPID_Out * -1`), a töltőszelep pedig lezár (`rFillValveCmd = 0`).
     * **Ha a hibajel a holtsávon belül van ($|rError| < rDeadband$):** Mindkét szelep parancsa 0 értéket vesz fel a felesleges szelepműködtetés elkerülése érdekében.
-
-![Hand PID Logic](docs/ladder_hand_pid.png)
-![Hand PID Demo](docs/demo_hand_pid.gif)
