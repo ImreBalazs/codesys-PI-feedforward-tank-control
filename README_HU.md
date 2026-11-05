@@ -227,7 +227,7 @@ PV_k_1 := PV_k;
 
 #### Algoritmus főbb tulajdonságai
 
-* **Deriválás a PV alapján (Derivative on PV):** A deriváló tag nem a hibajelből ($e_k$), hanem a mért érték változásából ($(PV_k - PV_{k-1})$) számol. Ez megakadályozza az alapjel hirtelen módosításakor fellépő úgynevezett deriválási tüskét (Derivative Kick).
+* **Deriválás a PV alapján (Derivative on PV):** A deriváló tag nem a hibajelből ($e_k$), hanem a mért érték változásából (PV_k - PV_(k-1)) számol. Ez megakadályozza az alapjel hirtelen módosításakor fellépő úgynevezett deriválási tüskét (Derivative Kick).
 * **Feltételes integrálás (Clamping Anti-Windup):** Ha a nyers kimenet (`u_raw`) átlépi a beállított $[u_{min}, u_{max}]$ határokat, az integrál belső állapota (`I_k_1`) nem frissül. Ez megelőzi a beavatkozó szerv telítődésekor fellépő integrál-túltöltődést és az abból adódó jelentős túllövést.
 
 ---
