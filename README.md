@@ -227,7 +227,7 @@ PV_k_1 := PV_k;
 
 #### Main Properties of the Algorithm
 
-- **Derivative on PV:** The derivative term is calculated not from the error signal ($e_k$) but from the change of the measured value ($(PV_k - PV_{k-1})$). This prevents the so-called derivative kick that occurs when the setpoint changes suddenly.
+- **Derivative on PV:** The derivative term is calculated not from the error signal ($e_k$) but from the change of the measured value (PV_k - PV_(k-1)). This prevents the so-called derivative kick that occurs when the setpoint changes suddenly.
 - **Conditional integration (Clamping Anti-Windup):** If the raw output (`u_raw`) exceeds the configured $[u_{min}, u_{max}]$ limits, the internal state of the integral (`I_k_1`) is not updated. This prevents integral windup when the actuator saturates, and the significant overshoot resulting from it.
 
 ---
